@@ -1,0 +1,8 @@
+venv
+poetry.lock
+**/.ipynb_checkpoints/
+dist
+**/__pycache__
+**/.coverage
+**/.vscode
+*.egg-info

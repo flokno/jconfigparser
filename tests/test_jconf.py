@@ -9,10 +9,14 @@ parent = Path(__file__).parent
 c1 = jp.ConfigDict(parent / "test.jconf", allow_multiple_options=True)
 
 
+c1.write("tmp.jconf")
+
+
 def test_read():
     c2 = json.load(open(parent / "ref.json"))
 
-    assert c1 == c2
+    for key in c2:
+        assert c1[key] == c2[key]
 
 
 def test_write(tmp_path):

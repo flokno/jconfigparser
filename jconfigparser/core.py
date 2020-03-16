@@ -1,24 +1,19 @@
 """ Settings class for holding settings, based on configparser.ConfigParser """
-import collections
 import configparser
 import json
-import sys
 import time
 from typing import Sequence
 
-DEFAULT_SETTINGS_FILE = "settings.jconf"
+from .dict import DotDict
 
-if sys.version_info >= (3, 7):
-    BASE_DICT = dict
-else:
-    BASE_DICT = collections.OrderedDict
+DEFAULT_SETTINGS_FILE = "settings.jconf"
 
 
 class DictList(list):
     """list used to store multiple keys for a dictionary"""
 
 
-class MultiOrderedDict(BASE_DICT):
+class MultiOrderedDict(DotDict):
     """A dict that can store multiple values for a key"""
 
     def __setitem__(self, key, value):
@@ -32,7 +27,7 @@ class MultiOrderedDict(BASE_DICT):
 class ConfigParser(configparser.ConfigParser):
     """ConfigParser that uses JSON to parse the values instead returning stings"""
 
-    def __init__(self, *args, dict_type=BASE_DICT, **kwargs):
+    def __init__(self, *args, dict_type=DotDict, **kwargs):
         super().__init__(
             *args,
             dict_type=dict_type,
@@ -59,7 +54,7 @@ class ConfigParser(configparser.ConfigParser):
         return result
 
 
-class ConfigDict(BASE_DICT):
+class ConfigDict(DotDict):
     """Dictionary that holds the configuration settings"""
 
     def __init__(
@@ -85,28 +80,20 @@ class ConfigDict(BASE_DICT):
         if allow_multiple_options:
             dict_type = MultiOrderedDict
         else:
-            dict_type = BASE_DICT
+            dict_type = DotDict
 
-        self.config = ConfigParser(dict_type=dict_type)
-        self.config.read(filenames)
+        self._config = ConfigParser(dict_type=dict_type)
+        self._config.read(filenames)
 
-        config = self.config
+        config = self._config
 
         # create dictionary
         for sec in config.sections():
-            sub_d = {}
-
-            self[sec] = dict_type()
-            for key in config[sec]:
-                self[sec][key] = config.getval(sec, key)
-
-            # check for nested section
             dot_sec = sec.replace("_", ".")
-            if "." in dot_sec:
-                sub_sec, sub_opt = dot_sec.split(".")
-                sub_d = {sub_opt: {k: config.getval(sec, k) for k in config[sec]}}
-                del self[sec]
-                self[sub_sec].update(sub_d)
+
+            self[dot_sec] = dict_type()
+            for key in config[sec]:
+                self[dot_sec][key] = config.getval(sec, key)
 
     def __str__(self):
         """ for printing the object """
@@ -118,7 +105,7 @@ class ConfigDict(BASE_DICT):
 
     def write_raw(self, filename: str = DEFAULT_SETTINGS_FILE):
         """write input file as parsed"""
-        self.config.write(open(filename, "w"))
+        self._config.write(open(filename, "w"))
 
     def write(self, filename: str = DEFAULT_SETTINGS_FILE):
         """write a settings object human readable
@@ -167,7 +154,7 @@ class ConfigDict(BASE_DICT):
                     for elem in self[sec][key]:
                         string += "{:{}s} {}\n".format(f"{key}:", width, elem)
                 # parse out dotted values
-                elif issubclass(elem.__class__, BASE_DICT):
+                elif issubclass(elem.__class__, DotDict):
                     string += f"\n[{sec}.{key}]\n"
                     for k, v in elem.items():
                         string += "{:{}s} {}\n".format(f"{k}:", width, v)

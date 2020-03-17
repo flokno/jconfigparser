@@ -62,13 +62,12 @@ class ConfigParser(configparser.ConfigParser):
         return result
 
 
-class ConfigDict(DotDict):
+class Config(DotDict):
     """Dictionary that holds the configuration settings"""
 
     def __init__(
         self,
         filenames: Sequence[str] = None,
-        dct: dict = None,
         allow_multiple_options: bool = False,
         **kwargs,
     ):
@@ -76,7 +75,6 @@ class ConfigDict(DotDict):
 
         Args:
             filenames: A list of configure files to read in
-            dct: a dictionary
             allow_multiple_options: convert multiple options into list
         """
         super().__init__(**kwargs)

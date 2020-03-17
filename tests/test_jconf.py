@@ -6,7 +6,7 @@ import jconfigparser as jp
 parent = Path(__file__).parent
 
 
-c1 = jp.ConfigDict(parent / "ref.jconf", allow_multiple_options=True)
+c1 = jp.Config(parent / "ref.jconf", allow_multiple_options=True)
 
 
 def test_json_dump(tmp_path):

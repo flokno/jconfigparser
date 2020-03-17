@@ -68,7 +68,7 @@ class Config(DotDict):
     def __init__(
         self,
         filenames: Sequence[str] = None,
-        allow_multiple_options: bool = False,
+        allow_multiple_options: bool = True,
         **kwargs,
     ):
         """Initialize ConfigDict
@@ -145,12 +145,12 @@ class Config(DotDict):
             for key in self[sec]:
                 elem = self[sec][key]
 
-                string += dumps_elem(elem, key, sec)
+                string += _dumps_elem(elem, key, sec)
 
         return string
 
 
-def dumps_elem(elem, key, sec):
+def _dumps_elem(elem, key, sec):
     string = ""
 
     if "numpy.ndarray" in str(type(elem)):
@@ -170,7 +170,7 @@ def dumps_elem(elem, key, sec):
     elif issubclass(elem.__class__, DotDict):
         string += f"\n[{sec}{key_separator}{key}]\n"
         for k, v in elem.items():
-            string += dumps_elem(v, k, key_separator.join([sec, key]))
+            string += _dumps_elem(v, k, key_separator.join([sec, key]))
             # string += "{:{}s} {}\n".format(f"{k}:", width, v)
 
     else:

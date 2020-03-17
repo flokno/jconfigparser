@@ -1,8 +1,11 @@
 venv
 poetry.lock
 **/.ipynb_checkpoints/
+**.ipynb
 dist
 **/__pycache__
 **/.coverage
 **/.vscode
 *.egg-info
+codecov.ini
+**coverage.xml

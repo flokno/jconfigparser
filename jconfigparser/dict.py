@@ -10,6 +10,7 @@ else:
 
 key_separator = "."
 private_prefix = "_"
+attribute_access = True
 strict = False
 empty = None
 
@@ -27,7 +28,9 @@ class DotDict(BASE_DICT):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__dict__ = self
+
+        if attribute_access:
+            self.__dict__ = self
 
     def __getitem__(self, key):
         keys = self._keys(key)

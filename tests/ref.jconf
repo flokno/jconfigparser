@@ -1,7 +1,8 @@
-[geometry]
+[atoms]
 file:                          geometry.in
+format:                        aims
 
-[control]
+[calculator.aims]
 xc:                            pbesol
 charge_mix_param:              0.3
 sc_accuracy_rho:               1e-6
@@ -14,16 +15,15 @@ output: band  0.375 0.375 0.75  0     0     0     50   K      Gamma
 output: band  0     0     0     0.25  0.25  0.25  50   Gamma  Lambda
 output: band  0.25  0.25  0.25  0.5   0.5   0.5   50   Lambda L
 
-[control_kpt]
+[calculator.kpoints]
 density:                       3.5
 
-[basisset]
-type:                          light
+[basissets.aims]
+default:                          light
 
 [phonopy]
 supercell_matrix:              [[-3, 3, 3], [3, -3, 3], [3, 3, -3]]
-workdir:                       ${control:xc}.${basisset:type}
+workdir:                       ${calculator.aims:xc}.${basissets.aims:default}
 
 [slurm]
 nodes:   6
-

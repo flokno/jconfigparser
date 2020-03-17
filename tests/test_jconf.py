@@ -6,7 +6,11 @@ import jconfigparser as jp
 parent = Path(__file__).parent
 
 
-c1 = jp.ConfigDict(parent / "test.jconf", allow_multiple_options=True)
+c1 = jp.ConfigDict(parent / "ref.jconf", allow_multiple_options=True)
+
+
+def test_json_dump(tmp_path):
+    json.dump(c1, open(tmp_path / "test.json", "w"), indent=1)
 
 
 def test_read():
@@ -18,6 +22,7 @@ def test_read():
 
 def test_write(tmp_path):
     outfile = tmp_path / "test.jconf"
+    c1.print()
     c1.write(outfile)
 
 

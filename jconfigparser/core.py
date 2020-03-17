@@ -12,6 +12,7 @@ DEFAULT_SETTINGS_FILE = "settings.jconf"
 key_separator = "."
 aux_key_separators = ["_", ":"]
 DotDict.key_separator = key_separator
+width = 30
 
 
 class DictList(list):
@@ -106,9 +107,9 @@ class ConfigDict(DotDict):
         """ for printing the object """
         return self.get_string()
 
-    def print(self, only_settings=False):
-        """ literally print(self) """
-        print(self.get_string(only_settings=only_settings), flush=True)
+    def print(self, **kwargs):
+        """ literally print(self) with `kwargs` for `get_string`"""
+        print(self.get_string(**kwargs), flush=True)
 
     def write(self, filename: str = DEFAULT_SETTINGS_FILE):
         """write a settings object human readable
@@ -121,7 +122,9 @@ class ConfigDict(DotDict):
             f.write(f"# configfile written at {timestr}\n")
             f.write(self.get_string())
 
-    def get_string(self, width: int = 30, ignore_sections: Sequence[str] = None) -> str:
+    def get_string(
+        self, width: int = width, ignore_sections: Sequence[str] = None
+    ) -> str:
         """ return string representation for writing etc.
 
         Args:
@@ -144,24 +147,35 @@ class ConfigDict(DotDict):
             for key in self[sec]:
                 elem = self[sec][key]
 
-                if "numpy.ndarray" in str(type(elem)):
-                    elem = elem.tolist()
-                #
-                if elem is None:
-                    elem = "null"
-                #
-                if key == "verbose":
-                    continue
-                # write out `MultiDict` keys one by one for readability
-                if isinstance(elem, DictList):
-                    for elem in self[sec][key]:
-                        string += "{:{}s} {}\n".format(f"{key}:", width, elem)
-                # parse out dotted values
-                elif issubclass(elem.__class__, DotDict):
-                    string += f"\n[{sec}{key_separator}{key}]\n"
-                    for k, v in elem.items():
-                        string += "{:{}s} {}\n".format(f"{k}:", width, v)
+                string += dumps_elem(elem, key, sec)
 
-                else:
-                    string += "{:{}s} {}\n".format(f"{key}:", width, elem)
         return string
+
+
+def dumps_elem(elem, key, sec):
+    string = ""
+
+    if "numpy.ndarray" in str(type(elem)):
+        elem = elem.tolist()
+    #
+    if elem is None:
+        elem = "null"
+    #
+    if key == "verbose":
+        return string
+
+    # write out `MultiDict` keys one by one for readability
+    if isinstance(elem, DictList):
+        for sub_elem in elem:
+            string += "{:{}s} {}\n".format(f"{key}:", width, sub_elem)
+    # parse out dotted values
+    elif issubclass(elem.__class__, DotDict):
+        string += f"\n[{sec}{key_separator}{key}]\n"
+        for k, v in elem.items():
+            string += dumps_elem(v, k, key_separator.join([sec, key]))
+            # string += "{:{}s} {}\n".format(f"{k}:", width, v)
+
+    else:
+        string += "{:{}s} {}\n".format(f"{key}:", width, elem)
+
+    return string

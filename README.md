@@ -3,11 +3,12 @@
 jconfigparser
 ===
 
-![python](https://img.shields.io/badge/python-3.6--3.8-informational.svg?style=flat)
-[![pypi](https://img.shields.io/pypi/v/jconfigparser.svg?style=flat)](https://pypi.org/project/jconfigparser/)
-![license](https://img.shields.io/pypi/l/jconfigparser.svg?color=red&style=flat)
-[![code style](https://img.shields.io/badge/code%20style-black-202020.svg?style=flat)](https://github.com/ambv/black)
-
+<p align="center">
+<a href="https://www.python.org/"><img alt="Python" src="https://img.shields.io/badge/python-3.6--3.8-informational.svg?style=flat"></a>
+<a href="https://pypi.org/project/jconfigparser/"><img alt="PyPi" src="https://img.shields.io/pypi/v/jconfigparser.svg?style=flat"></a>
+<a href="https://github.com/flokno/jconfigparser/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/pypi/l/jconfigparser.svg?color=red&style=flat"></a>
+<a href="https://github.com/ambv/black"><img alt="Black" src="https://img.shields.io/badge/code%20style-black-202020.svg?style=flat"></a>
+</p>
 `jconfigparser` is an extension of the `python` `configparser` standard module which adds the following features inspired by [`TOML`](https://github.com/toml-lang/toml):
 
 - Section name depth with dot notation: `[a.b]` 

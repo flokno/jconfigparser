@@ -10,7 +10,7 @@ DEFAULT_SETTINGS_FILE = "settings.jconf"
 
 # Key separators
 key_separator = "."
-aux_key_separators = ["_", ":"]
+aux_key_separators = [":"]
 DotDict.key_separator = key_separator
 width = 30
 

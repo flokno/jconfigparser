@@ -28,3 +28,7 @@ def test_write(tmp_path):
 
 def test_api():
     assert isinstance(c1.get_string(), str)
+
+
+def test_empty():
+    jp.Config()

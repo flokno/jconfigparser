@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jconfigparser"
-version = "0.1.0a2"
+version = "0.1.1a1"
 description = "Augmented python configparser"
 authors = ["Florian Knoop <florian_knoop@gmx.de>"]
 license = "ISC"

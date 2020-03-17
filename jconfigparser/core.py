@@ -82,6 +82,8 @@ class Config(DotDict):
         # make sure `filenames` is a list
         if isinstance(filenames, str):
             filenames = [filenames]
+        elif filenames is None:
+            filenames = []
 
         if allow_multiple_options:
             dict_type = MultiOrderedDict

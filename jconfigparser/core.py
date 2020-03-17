@@ -80,28 +80,35 @@ class Config(DotDict):
         super().__init__(**kwargs)
 
         # make sure `filenames` is a list
-        if isinstance(filenames, str):
-            filenames = [filenames]
+        if isinstance(filenames, tuple):
+            filenames = list(filenames)
         elif filenames is None:
             filenames = []
+        elif not isinstance(filenames, list):
+            filenames = [filenames]
 
         if allow_multiple_options:
             dict_type = MultiOrderedDict
         else:
             dict_type = BASE_DICT
 
-        config = ConfigParser(dict_type=dict_type)
-        config.read(filenames)
+        for file in filenames:
+            config = ConfigParser(dict_type=dict_type)
+            config.read([file])
 
-        # create dictionary
-        for sec in config.sections():
-            dot_sec = sec
-            for sep in aux_key_separators:
-                dot_sec = dot_sec.replace(sep, key_separator)
+            # create dictionary
+            for sec in config.sections():
+                dot_sec = sec
+                for sep in aux_key_separators:
+                    dot_sec = dot_sec.replace(sep, key_separator)
 
-            self[dot_sec] = DotDict()
-            for key in config[sec]:
-                self[dot_sec][key] = config.getval(sec, key)
+                if dot_sec in self and isinstance(self[dot_sec], DotDict):
+                    pass
+                else:
+                    self[dot_sec] = DotDict()
+
+                for key in config[sec]:
+                    self[dot_sec].update(DotDict({key: config.getval(sec, key)}))
 
     def __str__(self):
         """ for printing the object """

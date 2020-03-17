@@ -32,3 +32,10 @@ def test_api():
 
 def test_empty():
     jp.Config()
+
+
+def test_to_dict():
+    value = "hello"
+    c1._some_attr = value
+    d = c1.to_dict()
+    assert value not in d

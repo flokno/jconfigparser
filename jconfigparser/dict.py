@@ -20,6 +20,11 @@ class DotDict(BASE_DICT):
     some tricks from https://stackoverflow.com/a/14692747/5172579
     """
 
+    key_separator = key_separator
+    private_prefix = private_prefix
+    strict = strict
+    empty = empty
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.__dict__ = self
@@ -100,7 +105,7 @@ class DotDict(BASE_DICT):
         """ (recursively) return plain python dictionary """
         rep = {}
         for key, val in self.items():
-            if private_prefix is not None and key.startswith(private_prefix):
+            if private_prefix is not None and key.startswith(self.private_prefix):
                 continue
             if isinstance(val, DotDict):
                 val = val.to_dict()

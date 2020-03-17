@@ -37,7 +37,16 @@ class DotDict(BASE_DICT):
         if isinstance(d.get(last_key), dict) and self.strict:
             raise ValueError(f"{key} is a dict, danger of losing depth.")
 
-        d.update(DotDict({last_key: value}))
+        new_dict = DotDict({last_key: value})
+
+        keys = [*keys, last_key]
+
+        d = reduce(operator.getitem, keys[:-1], self)
+
+        if isinstance(d, DotDict):
+            d.update(new_dict)
+        else:
+            d = new_dict
 
     def _build_tree(self, key):
         # i) build tree of dicts
@@ -73,15 +82,15 @@ class DotDict(BASE_DICT):
         # set the last level w/o destroying deeper levels
         # https://stackoverflow.com/a/43499625/5172579
         keys = [first_key, *keys]
-        last_key = keys[-1]
+        next_last_key = keys[-1]
         d = reduce(operator.getitem, keys[:-1], self)
 
         # d has to be a dict:
-        if not isinstance(d[last_key], DotDict):
-            d[last_key] = DotDict()
+        if not isinstance(d[next_last_key], DotDict):
+            d[next_last_key] = DotDict()
 
-        if not d[last_key]:
-            d[last_key].update(DotDict({last_key: self.empty}))
+        if not d[next_last_key]:
+            d[next_last_key].update(DotDict({last_key: self.empty}))
 
     def _keys(self, key):
         return key.split(self.key_separator)

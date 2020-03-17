@@ -4,17 +4,24 @@ import json
 import time
 from typing import Sequence
 
-from .dict import DotDict
+from .dict import BASE_DICT, DotDict
 
 DEFAULT_SETTINGS_FILE = "settings.jconf"
+
+# Key separators
+key_separator = "."
+aux_key_separators = ["_", ":"]
+DotDict.key_separator = key_separator
 
 
 class DictList(list):
     """list used to store multiple keys for a dictionary"""
 
 
-class MultiOrderedDict(DotDict):
+class MultiOrderedDict(BASE_DICT):
     """A dict that can store multiple values for a key"""
+
+    key_separator = key_separator
 
     def __setitem__(self, key, value):
         if isinstance(value, list) and key in self:
@@ -27,7 +34,7 @@ class MultiOrderedDict(DotDict):
 class ConfigParser(configparser.ConfigParser):
     """ConfigParser that uses JSON to parse the values instead returning stings"""
 
-    def __init__(self, *args, dict_type=DotDict, **kwargs):
+    def __init__(self, *args, dict_type=BASE_DICT, **kwargs):
         super().__init__(
             *args,
             dict_type=dict_type,
@@ -80,18 +87,18 @@ class ConfigDict(DotDict):
         if allow_multiple_options:
             dict_type = MultiOrderedDict
         else:
-            dict_type = DotDict
+            dict_type = BASE_DICT
 
-        self._config = ConfigParser(dict_type=dict_type)
-        self._config.read(filenames)
-
-        config = self._config
+        config = ConfigParser(dict_type=dict_type)
+        config.read(filenames)
 
         # create dictionary
         for sec in config.sections():
-            dot_sec = sec.replace("_", ".")
+            dot_sec = sec
+            for sep in aux_key_separators:
+                dot_sec = dot_sec.replace(sep, key_separator)
 
-            self[dot_sec] = dict_type()
+            self[dot_sec] = DotDict()
             for key in config[sec]:
                 self[dot_sec][key] = config.getval(sec, key)
 
@@ -102,10 +109,6 @@ class ConfigDict(DotDict):
     def print(self, only_settings=False):
         """ literally print(self) """
         print(self.get_string(only_settings=only_settings), flush=True)
-
-    def write_raw(self, filename: str = DEFAULT_SETTINGS_FILE):
-        """write input file as parsed"""
-        self._config.write(open(filename, "w"))
 
     def write(self, filename: str = DEFAULT_SETTINGS_FILE):
         """write a settings object human readable
@@ -140,8 +143,8 @@ class ConfigDict(DotDict):
             string += f"\n[{sec}]\n"
             for key in self[sec]:
                 elem = self[sec][key]
-                if "numpy.ndarray" in str(type(elem)):
 
+                if "numpy.ndarray" in str(type(elem)):
                     elem = elem.tolist()
                 #
                 if elem is None:
@@ -155,7 +158,7 @@ class ConfigDict(DotDict):
                         string += "{:{}s} {}\n".format(f"{key}:", width, elem)
                 # parse out dotted values
                 elif issubclass(elem.__class__, DotDict):
-                    string += f"\n[{sec}.{key}]\n"
+                    string += f"\n[{sec}{key_separator}{key}]\n"
                     for k, v in elem.items():
                         string += "{:{}s} {}\n".format(f"{k}:", width, v)
 

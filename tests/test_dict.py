@@ -30,3 +30,16 @@ def test_getitem():
         assert isinstance(view, DotDict)
 
     assert d[keys] == value
+
+
+def test_thisandthat():
+    d = DotDict()
+
+    d["a"] = None
+
+    d["a.b"] = DotDict()
+    d["a"]["b"]["c"] = 3
+
+    d["a.b.d"] = 2
+
+    del d.a.b.c

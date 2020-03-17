@@ -8,16 +8,17 @@ if sys.version_info >= (3, 7):
 else:
     BASE_DICT = collections.OrderedDict
 
+key_separator = "."
+private_prefix = "_"
+strict = False
+empty = None
+
 
 class DotDict(BASE_DICT):
     """dict with dot access and assignment
 
     some tricks from https://stackoverflow.com/a/14692747/5172579
     """
-
-    key_separator = "."
-    strict = True
-    empty = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -94,3 +95,15 @@ class DotDict(BASE_DICT):
 
     def _keys(self, key):
         return key.split(self.key_separator)
+
+    def to_dict(self):
+        """ (recursively) return plain python dictionary """
+        rep = {}
+        for key, val in self.items():
+            if private_prefix is not None and key.startswith(private_prefix):
+                continue
+            if isinstance(val, DotDict):
+                val = val.to_dict()
+            rep.update({key: val})
+
+        return rep

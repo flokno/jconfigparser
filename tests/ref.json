@@ -20,6 +20,9 @@
   },
   "kpoints": {
    "density": 3.5
+  },
+  "socketio": {
+   "port": null
   }
  },
  "basissets": {

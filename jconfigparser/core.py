@@ -74,6 +74,7 @@ class Config(DotDict):
         Args:
             filenames: A list of configure files to read in
             allow_multiple_options: convert multiple options into list
+
         """
         super().__init__(**kwargs)
 
@@ -130,7 +131,7 @@ class Config(DotDict):
     def get_string(
         self, width: int = width, ignore_sections: Sequence[str] = None
     ) -> str:
-        """ return string representation for writing etc.
+        """return string representation for writing etc.
 
         Args:
             width: The width of the string column to print
@@ -138,19 +139,37 @@ class Config(DotDict):
 
         Returns:
             string: The string representation of the ConfigDict
+
         """
         if ignore_sections is None:
             ignore_sections = []
 
-        string = ""
+        # Create a representing dicitonary
+        # start by bringing non-dictionaries up
+        rep = BASE_DICT()
         for sec in self:
             # Filter out the private attributes
             if sec.startswith("_") or sec in ignore_sections:
                 continue
 
-            string += f"\n[{sec}]\n"
+            rep[sec] = BASE_DICT()
+            # i) add non-dict keys
             for key in self[sec]:
                 elem = self[sec][key]
+                if not issubclass(elem.__class__, BASE_DICT):
+                    rep[sec][key] = elem
+            # ii) add dict keys
+            for key in self[sec]:
+                elem = self[sec][key]
+                if issubclass(elem.__class__, BASE_DICT):
+                    rep[sec][key] = elem
+
+        string = ""
+        for sec in rep:
+            string += f"\n[{sec}]\n"
+
+            for key in rep[sec]:
+                elem = rep[sec][key]
 
                 string += _dumps_elem(elem, key, sec)
 
@@ -173,8 +192,9 @@ def _dumps_elem(elem, key, sec):
     if isinstance(elem, DictList):
         for sub_elem in elem:
             string += "{:{}s} {}\n".format(f"{key}:", width, sub_elem)
+
     # parse out dotted values
-    elif issubclass(elem.__class__, DotDict):
+    elif issubclass(elem.__class__, BASE_DICT):
         string += f"\n[{sec}{key_separator}{key}]\n"
         for k, v in elem.items():
             string += _dumps_elem(v, k, key_separator.join([sec, key]))

@@ -1,12 +1,7 @@
-import collections
 import operator
-import sys
 from functools import reduce
 
-if sys.version_info >= (3, 7):
-    BASE_DICT = dict
-else:
-    BASE_DICT = collections.OrderedDict
+BASE_DICT = dict
 
 key_separator = "."
 private_prefix = "_"

@@ -6,6 +6,7 @@ from typing import Sequence
 
 from .dict import BASE_DICT, DotDict, key_separator
 
+
 DEFAULT_SETTINGS_FILE = "settings.jconf"
 
 # Key separators
@@ -33,7 +34,7 @@ class MultiOrderedDict(BASE_DICT):
 class ConfigParser(configparser.ConfigParser):
     """ConfigParser that uses JSON to parse the values instead returning stings"""
 
-    def __init__(self, *args, dict_type=BASE_DICT, **kwargs):
+    def __init__(self, *args, dict_type=BASE_DICT, case_sensitive=True, **kwargs):
         super().__init__(
             *args,
             dict_type=dict_type,
@@ -41,6 +42,9 @@ class ConfigParser(configparser.ConfigParser):
             strict=False,
             **kwargs,
         )
+        # make keys case-sensitive
+        if case_sensitive:
+            self.optionxform = str
 
     def getval(self, *args, **kwargs):
         """ Redifine getval() to allow for json formated values (not only string) """

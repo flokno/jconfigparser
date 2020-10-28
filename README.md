@@ -75,3 +75,6 @@ Furthermore, `config` supports
 
 * Attribute access, e.g., `config.atoms.file`
 * Write itself: `config.write("new.jconf")`
+
+## Changelog
+- v0.1.3: per default, use case-sensitive keys

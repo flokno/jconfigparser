@@ -1,5 +1,7 @@
 from pathlib import Path
+
 import jconfigparser as jp
+
 
 parent = Path(__file__).parent
 
